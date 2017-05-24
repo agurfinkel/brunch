@@ -4,6 +4,7 @@ import os
 import os.path
 import sys
 import csv
+import subprocess as sub
 
 def isexec (fpath):
     if fpath == None: return False
@@ -102,6 +103,7 @@ def submitJob (tool_args, f, out, cpu, mem):
     sqsub_args.extend (fmt_tool_args)
 
     print ' '.join (sqsub_args)
+    sub.call (sqsub_args, shell=True)
     
 def runTool (tool_args, f, out, cpu, mem, fmt):
     global cpuTotal
@@ -121,7 +123,6 @@ def runTool (tool_args, f, out, cpu, mem, fmt):
     outfile = os.path.join (out, base + '.stdout')
     errfile = os.path.join (out, base + '.stderr')
     
-    import subprocess as sub
     
     p = sub.Popen (fmt_tool_args, 
                    stdout=open(outfile, 'w'), stderr=open(errfile, 'w'),
