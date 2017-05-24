@@ -124,7 +124,8 @@ def runTool (tool_args, f, out, cpu, mem, fmt):
     stats = collectStats (stats, errfile)
     statsLine (os.path.join (out, 'stats'), fmt, stats)
 
-def main (argv):
+def main ():
+    argv = sys.argv
     args = parseArgs (argv[1:])
 
     if not os.path.exists (args.out):
@@ -144,4 +145,4 @@ def main (argv):
                  fmt=fmt)
     return 0
 if __name__ == '__main__':
-    sys.exit (main (sys.argv))
+    sys.exit (main ())
