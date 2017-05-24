@@ -33,10 +33,14 @@ def parseArgs (argv):
                     help='Benchmark files')
     p.add_argument ('--prefix', default='BRUNCH_STAT', 
                     help='Prefix for stats')
-    p.add_argument ('--format', required=True, help='Fields')
-
+    p.add_argument ('--format', required=False, help='Fields',
+                    default='base:Status:Cpu:File')
     p.add_argument ('--out', metavar='DIR', 
                     default="out", help='Output directory')
+    p.add_argument ('--mode',
+                    help='Mode of operation: interactive, sqsub',
+                    choices=['interactive', 'sqsub'],
+                     default='interactive')
 
     if '-h' in argv or '--help' in argv:
         p.print_help ()
@@ -86,6 +90,19 @@ def statsLine (stats_file, fmt, stats):
 
 cpuTotal = 0.0
 
+def submitJob (tool_args, f, out, cpu, mem):
+    fmt_tool_args = [v.format(f=f) for v in tool_args]
+    fmt_tool_args[0] = which (fmt_tool_args[0])
+    base = os.path.basename (f)
+    outfile = os.path.join (out, base + '.stdout')
+    errfile = os.path.join (out, base + '.stderr')
+
+    sqsub_args = ['sqsub', '-r', str(cpu/60), '--mpp={m}G'.format(m=(mem/1024)),
+                  '-o', outfile, '-e', errfile]
+    sqsub_args.extend (fmt_tool_args)
+
+    print ' '.join (sqsub_args)
+    
 def runTool (tool_args, f, out, cpu, mem, fmt):
     global cpuTotal
     import resource as r
@@ -139,10 +156,14 @@ def main ():
     cpuTotal = r.getrusage (r.RUSAGE_CHILDREN).ru_utime    
 
     for f in args.file:
-        runTool (args.tool_args, f, args.out,
-                 cpu=args.cpu, 
-                 mem=args.mem, 
-                 fmt=fmt)
+        if args.mode == 'sqsub':
+            submitJob (args.tool_args, f, args.out,
+                       cpu=args.cpu, mem=args.mem)
+        else:
+            runTool (args.tool_args, f, args.out,
+                     cpu=args.cpu, 
+                     mem=args.mem, 
+                     fmt=fmt)
     return 0
 if __name__ == '__main__':
     sys.exit (main ())
