@@ -100,7 +100,7 @@ def submitJob (tool_args, f, out, cpu, mem):
 
     sqsub_args = ['sqsub', '-r', str(cpu/60), '--mpp={m}G'.format(m=(mem/1024)),
                   '-o', outfile, '-e', errfile]
-    sqsub_args = which (sqsub_args [0])
+    sqsub_args[0] = which (sqsub_args [0])
     sqsub_args.extend (fmt_tool_args)
 
     print ' '.join (sqsub_args)
