@@ -4,6 +4,8 @@ import os
 import os.path
 import re
 
+import pandas
+
 class PrefixFilter (object):
     def __init__ (self, pref):
         self.pref = pref
@@ -84,7 +86,6 @@ class LogScrabber (object):
     def add_record(self, index, field, value):
         rec = {'index': index, 'field': field, 'value': value}
         self.store.append (rec)
-        print 'rec:', rec
         
     def _scrab (self, name, line):
         for m in self.matchers:
@@ -108,7 +109,8 @@ class LogScrabber (object):
         '''Recursively process all files in the root directory'''
         for root, dirs, files in os.walk(root):
             for name in files:
-                if name.endswith ('.stdout') or name.endswith ('.stderr'):
+                #if name.endswith ('.stdout') or name.endswith ('.stderr'):
+                if name.endswith ('.stdout'):
                     self._processFile (os.path.join(root, name))        
     
     def _process (self, name):
@@ -119,9 +121,18 @@ class LogScrabber (object):
         else:
             assert False
             
+    def _writeTable (self, out):
+        df = pandas.DataFrame (self.store)
+        ## use pivot_table with aggfunc that picks the first value
+        df = df.pivot (index='index', columns='field', values='value')
+        print df.describe ()
+        
     def run (self, args=None):
         for f in args.in_files:
             self._process (f)
+
+        self._writeTable (args.out_file)
+        
         return 0
 
     def main (self, argv):
