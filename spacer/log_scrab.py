@@ -132,8 +132,7 @@ class LogScrabber (object):
                              columns='field',
                              values='value',
                              aggfunc = _last_fn)
-        print df.describe ()
-        
+        df.to_csv (out)
     def run (self, args=None):
         for f in args.in_files:
             self._process (f)
