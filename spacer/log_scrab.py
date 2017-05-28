@@ -58,6 +58,10 @@ class ExitStatus (object):
         return (self.field, value)
     
 
+def _escape (s):
+    s = s.replace ('.', '_').replace ('-', '_')
+    return s
+
 class LogScrabber (object):
     def __init__ (self, name='LogScrabber', help='Scrabbs Spacer logs'):
         self.name = name
@@ -85,6 +89,7 @@ class LogScrabber (object):
         return ap
     
     def add_record(self, index, field, value):
+        field = _escape (field)
         rec = {'index': index, 'field': field, 'value': value}
         self.store.append (rec)
         
