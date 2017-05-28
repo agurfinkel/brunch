@@ -74,6 +74,11 @@ def collectStats (stats, file):
     f.close ()
     return stats
 
+def logToolArgs (args_file, tool_args):
+    with open (args_file, 'w') as output:
+        output.write (' '.join (tool_args))
+        output.write ('\n')
+    
 def statsHeader (stats_file, flds):
     with open (stats_file, 'w') as sf:
         writer = csv.writer (sf)
@@ -150,8 +155,11 @@ def main ():
     if not os.path.exists (args.out):
         os.mkdir (args.out)
 
-    fmt = args.format.split (':')
-    statsHeader (os.path.join (args.out, 'stats'), fmt)
+    logToolArgs (os.path.join (args.out, 'tool_args'), args.tool_args)
+    
+    if args.mode <> 'sqsub':
+        fmt = args.format.split (':')
+        statsHeader (os.path.join (args.out, 'stats'), fmt)
 
     global cpuTotal
     import resource as r
