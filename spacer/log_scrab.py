@@ -57,6 +57,7 @@ class ExitStatus (object):
         value = int (l.strip ())
         return (self.field, value)
     
+
 class LogScrabber (object):
     def __init__ (self, name='LogScrabber', help='Scrabbs Spacer logs'):
         self.name = name
@@ -109,8 +110,7 @@ class LogScrabber (object):
         '''Recursively process all files in the root directory'''
         for root, dirs, files in os.walk(root):
             for name in files:
-                #if name.endswith ('.stdout') or name.endswith ('.stderr'):
-                if name.endswith ('.stdout'):
+                if name.endswith ('.stdout') or name.endswith ('.stderr'):
                     self._processFile (os.path.join(root, name))        
     
     def _process (self, name):
@@ -123,8 +123,15 @@ class LogScrabber (object):
             
     def _writeTable (self, out):
         df = pandas.DataFrame (self.store)
+        
+        def _last_fn (a):
+            return a.get_value (a.first_valid_index ())
+
         ## use pivot_table with aggfunc that picks the first value
-        df = df.pivot (index='index', columns='field', values='value')
+        df = df.pivot_table (index='index',
+                             columns='field',
+                             values='value',
+                             aggfunc = _last_fn)
         print df.describe ()
         
     def run (self, args=None):
