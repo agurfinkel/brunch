@@ -57,6 +57,17 @@ class ExitStatus (object):
         value = int (l.strip ())
         return (self.field, value)
     
+class CpuTime (object):
+    def __init__ (self):
+        self.field = 'cpu'
+
+    def match (self, line):
+        try:
+            if not line.startswith ('cpu time: '):
+                return None
+            return (self.field, int (line.split()[2][:-1]))
+        except:
+            return None
 
 def _escape (s):
     s = s.replace ('.', '_').replace ('-', '_')
@@ -73,6 +84,7 @@ class LogScrabber (object):
 
     def __init_matchers (self):
         self.matchers.append (ExitStatus ())
+        self.matchers.append (CpuTime ())
         self.matchers.append (ExactMatch ('result', ['sat','unsat']))
         regex = ':(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
         flt = PrefixFilter (['SPACER-', 'time', 'virtual_solver'])
