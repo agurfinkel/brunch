@@ -58,9 +58,10 @@ class LoadTable (object):
                 flds [fld [i]] = 0
         return fld
     
-    def create_ufo_table (self, db, table, flds, types):
+    def create_ufo_table (self, db, table, flds, types, pk):
         sql_fld_names = map (self.fld_name, flds)
         sql_fld_types = map (lambda x: x == None and 'text' or x, types)
+        sql_pk = self.fld_name (pk)
 
         sql_col_def = ', '.join ([' '.join ((x, y)) 
                                 for (x,y) in zip (sql_fld_names, sql_fld_types)])
@@ -70,17 +71,17 @@ class LoadTable (object):
         ctable = """
     drop table if exists {name};
     drop index if exists {name}_total;
-    drop index if exists {name}_file;
+    drop index if exists {name}_{pk};
     create	table if not exists {name}( {cols} );
 
-    create unique index if not exists {name}_file on {name}(file);
+    create unique index if not exists {name}_{pk} on {name}({pk});
 
     """
-        ctable = ctable.format (name=table, cols=sql_col_def)
+        ctable = ctable.format (name=table, cols=sql_col_def, pk=sql_pk)
         db.cursor ().executescript (ctable);
         db.commit ()
     
-    def load_ufo_csv (self, csvfile, db, table, create_table = False):
+    def load_ufo_csv (self, csvfile, db, table, pk, create_table = False):
         print "Loading file '{name}'".format (name=csvfile)
         c = db.cursor ()
         with open (csvfile, 'rb') as infile:
@@ -95,7 +96,7 @@ class LoadTable (object):
 
             if create_table: 
                 types = self.deduce_types (reader)
-                self.create_ufo_table (db, table, fld, types)
+                self.create_ufo_table (db, table, fld, types, pk)
 
                 ## reset everything to the beginning
                 infile.seek (0)
@@ -128,6 +129,7 @@ class LoadTable (object):
         ap.add_argument ('--use-existing', dest='existing',
                          default=False, help='Do not re-create the table',
                          action='store_true')
+        ap.add_argument ('--pk', default='file', help='Primary key column')
         ap.add_argument ('in_files', nargs='+', help='CSV files')
 
         return ap
@@ -136,7 +138,7 @@ class LoadTable (object):
         db = sql.connect (args.db)
         create_table = not args.existing
         for file in args.in_files:
-            self.load_ufo_csv (file, db, args.table, create_table)
+            self.load_ufo_csv (file, db, args.table, args.pk, create_table)
             create_table = False
 
         #    create_solved_views (db, opt.table)
