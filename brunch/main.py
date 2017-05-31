@@ -55,6 +55,10 @@ def parseArgs (argv):
     args = p.parse_args (argv[:k])
     args.tool_args = argv[k+1:]
 
+    # include cluster name in output directory
+    if 'CLUSTER' in os.environ:
+        args.out = args.out + '.' + os.environ['CLUSTER']
+        
     # include date in output directory
     import datetime as dt
     dt = dt.datetime.now ().strftime ('%d_%m_%Y-t%H-%M-%S')
