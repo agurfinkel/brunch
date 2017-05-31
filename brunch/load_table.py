@@ -11,7 +11,8 @@ class LoadTable (object):
         self.name = 'load_table'
         self.help = 'Create a table based on csv'
         self.fld_dict = { 'filename': 'file',
-                          '#pass-ing' : 'pass_ing'}
+                          '#pass-ing' : 'pass_ing',
+                          'index' : 'idx'}
 
     def fld_name (self, fld):
         if fld in self.fld_dict: return self.fld_dict [fld]
