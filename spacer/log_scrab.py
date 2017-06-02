@@ -69,6 +69,19 @@ class CpuTime (object):
         except:
             return None
 
+class BrunchStat (object):
+    def __init__ (self):
+        pass
+    def match (self, line):
+        """BRUNCH_STAT field value"""
+        try:
+            if not line.startswith ('BRUNCH_STAT'):
+                return None
+            fields = line.split ()
+            return (fields[1], fields[2])
+        except:
+            return None
+        
 def _escape (s):
     s = s.replace ('.', '_').replace ('-', '_')
     return s
@@ -83,13 +96,15 @@ class LogScrabber (object):
         self.__init_matchers ()
 
     def __init_matchers (self):
+        self.matchers.append (ExactMatch ('result', ['sat','unsat']))
         self.matchers.append (ExitStatus ())
         self.matchers.append (CpuTime ())
-        self.matchers.append (ExactMatch ('result', ['sat','unsat']))
+        self.matchers.append (BrunchStat ())
         regex = ':(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
         flt = PrefixFilter (['SPACER-', 'time', 'virtual_solver'])
         reMatch = ReMatch(regex=regex, filt=flt)
         self.matchers.append (reMatch)
+        
 
     def mk_arg_parser (self, ap):
         ap.add_argument ('-o', dest='out_file',
