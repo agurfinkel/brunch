@@ -157,7 +157,7 @@ class LogScrabber (object):
         df = pandas.DataFrame (self.store)
         
         def _last_fn (a):
-            return a.get_value (a.first_valid_index ())
+            return a.get_value (a.last_valid_index ())
 
         ## use pivot_table with aggfunc that picks the first value
         df = df.pivot_table (index='index',
