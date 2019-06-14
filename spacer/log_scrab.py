@@ -1,4 +1,7 @@
+#! /usr/bin/env python
+
 ### Log scrabber for Spacer
+from __future__ import print_function
 import sys
 import os
 import os.path
@@ -32,7 +35,6 @@ class ReMatch (object):
             return None
 
         return (fld, res.group ('val'))
-
 
 class ExactMatch (object):
     def __init__ (self, name, values):
@@ -88,6 +90,34 @@ class CpuTime (object):
         except:
             return None
 
+class RealTime (object):
+    def __init__ (self):
+        self.field = 'real_time'
+
+    def match (self, line):
+        """From runsolver"""
+        try:
+            if not line.startswith ('Real time (s): '):
+                return None
+            val = float(line.split(':')[1].strip())
+            return (self.field, val)
+        except:
+            return None
+
+class MaxMemory (object):
+    def __init__ (self):
+        self.field = 'max_memory'
+
+    def match (self, line):
+        """From runsolver"""
+        try:
+            if not line.startswith ('Max. memory (cumulated for all children) (KiB): '):
+                return None
+            val = line.split(':')[1].strip()
+            return (self.field, int (val))
+        except:
+            return None
+
 class BrunchStat (object):
     def __init__ (self):
         pass
@@ -121,6 +151,8 @@ class LogScrabber (object):
         self.matchers.append (ErrorExcMatch ('result'))
         self.matchers.append (ExitStatus ())
         self.matchers.append (CpuTime ())
+        self.matchers.append (RealTime ())
+        self.matchers.append (MaxMemory ())
         self.matchers.append (BrunchStat ())
         regex = ':(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
         flt = PrefixFilter (['SPACER-', 'time', 'virtual_solver',
@@ -150,8 +182,8 @@ class LogScrabber (object):
                 if res is not None:
                     self.add_record (name, res[0], res[1])
             except:
-                print '[WARNING]: exception for:', line
-                print "Unexpected error:", sys.exc_info()
+                print('[WARNING]: exception for:', line)
+                print("Unexpected error:", sys.exc_info())
     def _processFile (self, fname):
         '''process a single file'''
 
@@ -184,7 +216,7 @@ class LogScrabber (object):
         df = pandas.DataFrame (self.store)
 
         def _last_fn (a):
-            return a.get_value (a.last_valid_index ())
+            return a.at[a.last_valid_index ()]
 
         ## use pivot_table with aggfunc that picks the first value
         df = df.pivot_table (index='index',
