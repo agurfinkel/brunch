@@ -65,17 +65,16 @@ class ErrorExcMatch (object):
             return (self.field, 'error')
         return None
 
-
 class ExitStatus (object):
     def __init__ (self):
         self.field = 'status'
 
     def match (self, line):
-        if not line.startswith ('exit status: '):
+        if not line.startswith ('exit status: ') \
+            and not line.startswith ('Child status: '):
             return None
 
-        l = line[len('exit status: '):]
-        value = int (l.strip ())
+        value = int (line.split (':')[1].strip ())
         return (self.field, value)
 
 class CpuTime (object):
@@ -100,7 +99,7 @@ class RealTime (object):
             if not line.startswith ('Real time (s): '):
                 return None
             val = float(line.split(':')[1].strip())
-            return (self.field, val)
+            return (self.field, "{:.2f}".format(val))
         except:
             return None
 
