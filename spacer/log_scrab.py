@@ -70,12 +70,16 @@ class ExitStatus (object):
         self.field = 'status'
 
     def match (self, line):
-        if not line.startswith ('exit status: ') \
-            and not line.startswith ('Child status: '):
-            return None
+        if line.startswith ('exit status: ') \
+            or line.startswith ('Child status: '):
+            value = int(line.split(':')[1].strip())
+            return (self.field, value)
 
-        value = int (line.split (':')[1].strip ())
-        return (self.field, value)
+        if line.startswith ('Child ended because it received signal'):
+            value = int(line.split()[-2])
+            return (self.field, value)
+
+        return None
 
 class CpuTime (object):
     def __init__ (self):
