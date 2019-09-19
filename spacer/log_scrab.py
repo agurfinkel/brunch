@@ -148,10 +148,10 @@ class LogScrabber (object):
         self.__init_matchers ()
 
     def __init_matchers (self):
-        self.matchers.append (ExactMatch ('result',
+        self.matchers.append (ExactMatch ('status',
                                           ['sat','unsat','timeout','unknown']))
-        self.matchers.append (MemoryExcMatch ('result'))
-        self.matchers.append (ErrorExcMatch ('result'))
+        self.matchers.append (MemoryExcMatch ('status'))
+        self.matchers.append (ErrorExcMatch ('status'))
         self.matchers.append (ExitStatus ())
         self.matchers.append (CpuTime ())
         self.matchers.append (RealTime ())
