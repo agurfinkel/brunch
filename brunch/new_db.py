@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import sys
 import sqlite3 as sql
@@ -20,7 +20,7 @@ class NewDb (object):
         curs.executescript (ctable)
 
         ivalue = "insert into nums values (?);"
-        curs.executemany (ivalue, [ (i, ) for i in xrange (1, 120, 1)])
+        curs.executemany (ivalue, [ (i, ) for i in range (1, 120, 1)])
 
         db.commit ()
         

@@ -1,12 +1,11 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 ### Log scrabber for Spacer
-from __future__ import print_function
+
 import sys
 import os
 import os.path
 import re
-
 import pandas
 
 class PrefixFilter (object):

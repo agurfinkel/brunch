@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/evn python3
 
 import sys
 import csv
@@ -32,7 +32,7 @@ class LoadTable (object):
                 return 'text'
     
     def deduce_types (self, reader):
-        types = map (self.get_type, next (reader))
+        types = list(map (self.get_type, next (reader)))
         def merge_type (t1, t2):
             if t1 == 'text' or t2 == 'text': return 'text'
             elif t1 == 'real' or t2 == 'real': return 'real'
@@ -59,14 +59,14 @@ class LoadTable (object):
         return fld
     
     def create_ufo_table (self, db, table, flds, types, pk):
-        sql_fld_names = map (self.fld_name, flds)
-        sql_fld_types = map (lambda x: x == None and 'text' or x, types)
+        sql_fld_names = list(map (self.fld_name, flds))
+        sql_fld_types = [x == None and 'text' or x for x in types]
         sql_pk = self.fld_name (pk)
 
         sql_col_def = ', '.join ([' '.join ((x, y)) 
                                 for (x,y) in zip (sql_fld_names, sql_fld_types)])
 
-        print "Creating table '{table}'".format(table=table)
+        print("Creating table '{table}'".format(table=table))
 
         ctable = """
     drop table if exists {name};
@@ -82,7 +82,7 @@ class LoadTable (object):
         db.commit ()
     
     def load_ufo_csv (self, csvfile, db, table, pk, create_table = False):
-        print "Loading file '{name}'".format (name=csvfile)
+        print("Loading file '{name}'".format (name=csvfile))
         c = db.cursor ()
         with open (csvfile, 'rb') as infile:
             reader = csv.reader (infile, dialect='excel')
@@ -107,7 +107,7 @@ class LoadTable (object):
         db.commit ()
     
     def create_solved_views (self, db, table):
-        print "Creating solved views"
+        print("Creating solved views")
         view = """
     create view if not exists {name}_solved as select num, count(*) as solved from {name}, nums where (res is 'SAFE' or res is 'CEX') and total <= num group by num order by num;
 
