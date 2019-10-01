@@ -20,15 +20,20 @@ class PrefixFilter (object):
         return False
 
 class ReMatch (object):
-    def __init__ (self, regex, filt):
+    def __init__ (self, regex, filt = None, field = None):
         self._re = re.compile (regex)
         self._filter = filt
+        self._field = field
 
     def match (self, line):
         res = self._re.match (line)
         if res is None: return None
 
-        fld = res.group ('fld')
+        if self._field is None:
+            fld = res.group ('fld')
+        else:
+            fld = self._field
+
         # optionally filter out
         if self._filter is not None and fld not in self._filter:
             return None
@@ -79,6 +84,25 @@ class ExitStatus (object):
             return (self.field, value)
 
         return None
+
+class PosixTime(object):
+    """
+    Time as produced by posix time (`time -p`)
+    """
+    def __init__(self):
+        pass
+
+    def match(self,line):
+        try:
+            if line.startswith('real') or \
+               line.startswith('user') or \
+               line.startswith('sys'):
+                flds = line.split()
+                if len(flds) == 2:
+                    return (flds[0], float(flds[1]))
+            return None
+        except:
+            return None
 
 class CpuTime (object):
     def __init__ (self):
@@ -154,13 +178,18 @@ class LogScrabber (object):
         self.matchers.append (ExitStatus ())
         self.matchers.append (CpuTime ())
         self.matchers.append (RealTime ())
+        self.matchers.append(PosixTime())
         self.matchers.append (MaxMemory ())
         self.matchers.append (BrunchStat ())
-        regex = '[(]?:(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
+        regex = r'[(]?:(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
         flt = PrefixFilter (['SPACER-', 'time', 'virtual_solver',
                              'memory', 'max-memory'])
         reMatch = ReMatch(regex=regex, filt=flt)
         self.matchers.append (reMatch)
+
+        btor_time_regex = r'^\[.*\]\s+(?P<val>\d+(\.\d+)?)\s+seconds'
+        btor_time = ReMatch(regex=btor_time_regex, field='btor_time')
+        self.matchers.append(btor_time)
 
 
     def mk_arg_parser (self, ap):
@@ -196,7 +225,7 @@ class LogScrabber (object):
         else:
             name, _ext = os.path.splitext (base_name)
 
-        with open (fname) as input:
+        with open (fname, errors='replace') as input:
             for line in input:
                 self._scrab (name, line.strip ())
 
