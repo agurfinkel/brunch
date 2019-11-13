@@ -66,7 +66,9 @@ class ErrorExcMatch (object):
 
     def match (self, line):
         if line.endswith('unexpected end of quoted symbol")'):
-            return (self.field, 'error')
+            return (self.field, 'error_quote')
+        elif line.endswith('Invalid query argument, expected uinterpreted function name, but argument is interpreted")'):
+            return (self.field, 'error_interp')
         return None
 
 class ExitStatus (object):
