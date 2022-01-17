@@ -16,7 +16,9 @@ class Z3Namer(object):
         self._help = 'Name for z3 binary'
 
     def mk_arg_parser(self, ap):
-        ap.add_argument('z3bin', metavar='Z3_BIN', help='Full path to z3 binary')
+        ap.add_argument('z3bin',
+                        metavar='Z3_BIN',
+                        help='Full path to z3 binary')
         return ap
 
     def run(self, args=None):
@@ -31,7 +33,6 @@ class Z3Namer(object):
         z3bin_base = os.path.basename(z3bin)
 
         print(f'{z3bin_base}-{noun}-{short_git_sha}')
-
 
     def main(self, argv):
         ap = argparse.ArgumentParser(prog=self._name, description=self._help)
