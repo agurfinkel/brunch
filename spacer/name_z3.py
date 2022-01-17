@@ -7,6 +7,7 @@ import words
 import subprocess
 import argparse
 import os.path
+import shutil
 
 
 class Z3Namer(object):
@@ -19,9 +20,22 @@ class Z3Namer(object):
         ap.add_argument('z3bin',
                         metavar='Z3_BIN',
                         help='Full path to z3 binary')
+        ap.add_argument('-o',
+                        type=str,
+                        metavar="DIR",
+                        help='Copies renamed binary to given directory',
+                        default=None)
         return ap
 
     def run(self, args=None):
+
+        copy_mode = args.o is not None
+        out_dir = args.o
+
+        if copy_mode and not os.path.isdir(out_dir):
+            print(f"Error: '{out_dir}' is not a directory", file=sys.stderr)
+            return 1
+
         z3bin = args.z3bin
         z3ver_str = subprocess.check_output(f'{z3bin} --version',
                                             shell=True,
@@ -32,7 +46,11 @@ class Z3Namer(object):
         noun = words.get_a_noun(length=5, bound='atmost', seed=git_sha)
         z3bin_base = os.path.basename(z3bin)
 
-        print(f'{z3bin_base}-{noun}-{short_git_sha}')
+        z3_name = f'{z3bin_base}-{noun}-{short_git_sha}'
+        if copy_mode:
+            shutil.copy2(z3bin, os.path.join(out_dir, z3_name))
+        else:
+            print(z3_name)
         return 0
 
     def main(self, argv):
