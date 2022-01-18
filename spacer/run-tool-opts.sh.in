@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# DATE=$$(date +%d_%m_%Y-t%H-%M-%S)
+
+TOOL_NAME=${tool_name}
+OPT_NAME=${opt_name}
+TOOL=${tool}
+
+EXP_NAME=$$(python -m spacer.exp_name ${idx})
+
+OUT=${out_dir}/$${TOOL_NAME}.$${OPT_NAME}.$${EXP_NAME}
+
+echo "Creating directory: $$OUT"
+mkdir -p $$OUT
+
+PARALLEL=${parallel}
+JOBS=${jobs}
+
+time $$PARALLEL -j $$JOBS --ungroup --results $$OUT/{/} $$TOOL :::: ${idx}
