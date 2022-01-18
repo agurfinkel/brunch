@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# DATE=$$(date +%d_%m_%Y-t%H-%M-%S)
-
 TOOL_NAME=${tool_name}
 OPT_NAME=${opt_name}
 TOOL=${tool}
