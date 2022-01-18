@@ -28,7 +28,6 @@ class Z3Namer(object):
         return ap
 
     def run(self, args=None):
-
         copy_mode = args.o is not None
         out_dir = args.o
 
