@@ -48,6 +48,8 @@ def z3_dict_to_cli(opts, prefix=None):
         if isinstance(v, dict):
             cli.extend(z3_dict_to_cli(v, _concat(prefix, k)))
         elif prefix == 'z3':
+            # allow for dash in key names
+            k = k[1:] if k.startswith('-') else k
             # handle z3 namespace specially, it is reserved for cli flags
             if isinstance(v, list):
                 # handle things like {'tr':['spacer', 'spacer_verbose']}
