@@ -42,8 +42,9 @@ class MkTool(object):
             print(f"{z3bin} {opts}")
             return 0
 
-        # read template
+        # == Create script file ==
 
+        # read template
         resource = importlib.resources.files(__package__) / "tool-opts.sh.in"
         with resource.open('r') as f:
             body = string.Template(f.read())
@@ -51,12 +52,20 @@ class MkTool(object):
         # /PATH/z3-cat-a94304.exe --> cat
         tool_name = os.path.basename(z3bin)
         tool_name = os.path.splitext(tool_name)[0]
-        tool_name = tool_name.split('-')[1]
+        tool_name = tool_name.split('-')
+        if len(tool_name) == 3 and tool_name[0] == 'z3':
+            tool_name = tool_name[1]
+        else:
+            tool_name = '_'.join(tool_name)
 
         # /PATH/z3-high.conf --> high
         opts_name = os.path.basename(args.yaml)
         opts_name = os.path.splitext(opts_name)[0]
-        opts_name = opts_name.split('-')[1]
+        opts_name = opts_name.split('-')
+        if len(opts_name) == 2 and opts_name[0] == 'z3':
+            opts_name = opts_name[1]
+        else:
+            opts_name = '_'.join(opts_name)
 
         # write out file
         out_file = os.path.join(args.out, f'{tool_name}-{opts_name}.sh')
