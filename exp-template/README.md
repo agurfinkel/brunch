@@ -8,7 +8,7 @@ In the instructions below, `${BRUNCH_DIR}` is the root of `brunch` checkout
 
 ```bash
 # Setup
-$ cp -fav ${BRUNCH_DIR}/exp_tempalte /tmp/exp
+$ cp -fav ${BRUNCH_DIR}/exp_template /tmp/exp
 $ cd /tmp/exp
 $ python3.9 -m venv .venv
 $ echo ${BRUNCH_DIR} > ./.venv/lib/python3.9/site-packages/brunch.pth
