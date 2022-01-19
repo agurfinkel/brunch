@@ -8,7 +8,10 @@ EXP_NAME=$$(python -m spacer.exp_name ${idx})
 
 OUT=${out_dir}/$${TOOL_NAME}.$${OPTS_NAME}.$${EXP_NAME}
 
-echo "Experiment: $${EXP_NAME}"
+GRN="$(tput setaf 2)"
+RST="$(tput sgr0)"
+
+echo -e "Experiment: $${GRN}$${EXP_NAME}$${RST}"
 echo "Creating output directory: $$OUT"
 mkdir -p $$OUT
 
