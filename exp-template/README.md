@@ -39,6 +39,5 @@ $ time run/run-hit-spurned.sh
 
 # Generate stats.csv for further analysis.
 # Repeat for every output directory
-$ ./brunch/scrab  -o out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40/stats.csv \
-  out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40
+$ ./brunch/scrab out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40
 ```
