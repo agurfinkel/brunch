@@ -6,7 +6,7 @@
 
 In the instructions below, `${BRUNCH_DIR}` is the root of `brunch` checkout
 
-```
+```bash
 # Setup
 $ cp -fav ${BRUNCH_DIR}/exp_tempalte /tmp/exp
 $ cd /tmp/exp
