@@ -14,4 +14,5 @@ mkdir -p $$OUT
 PARALLEL=${parallel}
 JOBS=${jobs}
 
+echo "Starting parallel with $$JOBS jobs..."
 time $$PARALLEL -j $$JOBS --ungroup --results $$OUT/{/} $$TOOL :::: ${idx}
