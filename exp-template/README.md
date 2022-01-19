@@ -1,14 +1,43 @@
+# Brunch experiment setup
+
+## Sample interaction
+
+**Note requires Python v3.9 or above**
+
+In the instructions below, `${BRUNCH_DIR}` is the root of `brunch` checkout
+
 ```
-python3.9 -m venv .venv
-vim ./.venv/lib/python3.9/site-packages/brunch.pth
-source ./.venv/bin/activate
-pip install -r /ag/brunch/requirements.txt
-python -m spacer.name_z3 /ag/bat-exp/bin/z3 -o bin
-vim conf/opts.yaml
-python -m spacer.yama conf/opts.yaml  -o ./conf
-find /ag/bat-exp/data/ldv-bat -name '*.smt2' | head > ldv-bat.idx
-python -m spacer.mktool bin/z3_deep_space-hit-c34b1d0 conf/z3-spurned.yaml
-python -m spacer.mkpar run/hit-spurned.sh idx/ldv-bat.idx
-time ./run/run-hit-spurned.sh
-python -m spacer.log_scrab -o out/hit.spurned.ldv-bat.mymble.cervix.18_01_2022-t20-24-58/stats.csv out/hit.spurned.ldv-bat.mymble.cervix.18_01_2022-t20-24-58
+# Setup
+$ cp -fav ${BRUNCH_DIR}/exp_tempalte /tmp/exp
+$ cd /tmp/exp
+$ python3.9 -m venv .venv
+$ echo ${BRUNCH_DIR} > ./.venv/lib/python3.9/site-packages/brunch.pth
+$ source ./.venv/bin/activate
+$ pip install -r ${BRUNCH_DIR}/requirements.txt
+
+# (Optional) Edit some options 
+$ vim conf/opts.yaml
+# Give unique adjective to a set of options
+$ ./brunch/yama -o ./conf conf/opts.yaml
+
+# Create uniquely named z3 binary
+$ ./brunch/mkz3 PATH/z3 -o ./bin
+
+# Create uniquely named binary + options run script
+#  Name of z3 binary depends on result of mkz3
+$ ./brunch/mktool bin/z3-hit-c34b1d0 conf/z3-spurned.yaml
+
+# Create a list of benchmarks
+$ find /ag/bat-exp/data/ldv-bat/ -name '*.smt2' | head > idx/ldv-bat.idx
+
+# Create script to run parallel
+$ ./brunch/mkpar ./run/hit-spurned.sh idx/ldv-bat.idx
+
+# Run benchmarks. Repeat as needed. Output is in out directory
+$ time run/run-hit-spurned.sh
+
+# Generate stats csv for further analysis
+# Repeat for every output directory
+$ ./brunch/scrab  -o out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40/stats.csv \
+  out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40
 ```
