@@ -1,0 +1,23 @@
+z3:
+  v: 1
+  st: ''
+  T: 50
+  memory: 16384
+fixedpoint:
+  xform:
+    slice: false
+    inline_linear: false
+    inline_eager: false
+    tail_simplifier_pve: false
+  print_statistics: true
+  pdr.validate_result: true
+  engine: spacer
+  spacer:
+    elim_aux: true
+    reach_dnf: true
+    iuc: 1
+    iuc.arith: 1
+    ground_cti: true
+    mbqi: false
+    ctp: true
+    native_mbp: true
