@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 TOOL_NAME=${tool_name}
-OPT_NAME=${opt_name}
+OPTS_NAME=${opts_name}
 TOOL=${tool}
 
 EXP_NAME=$$(python -m spacer.exp_name ${idx})
 
-OUT=${out_dir}/$${TOOL_NAME}.$${OPT_NAME}.$${EXP_NAME}
+OUT=${out_dir}/$${TOOL_NAME}.$${OPTS_NAME}.$${EXP_NAME}
 
 echo "Creating directory: $$OUT"
 mkdir -p $$OUT
