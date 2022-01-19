@@ -14,5 +14,7 @@ mkdir -p $$OUT
 PARALLEL=${parallel}
 JOBS=${jobs}
 
-echo "Starting parallel with $$JOBS jobs..."
+echo "Experiment: $${EXP_NAME}"
+echo "Output directory: $${OUT}"
+echo "Starting GNU parallel with $$JOBS jobs ..."
 time $$PARALLEL -j $$JOBS --ungroup --results $$OUT/{/} $$TOOL :::: ${idx}
