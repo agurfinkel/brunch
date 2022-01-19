@@ -17,26 +17,27 @@ $ pip install -r ${BRUNCH_DIR}/requirements.txt
 
 # (Optional) Edit some options 
 $ vim conf/opts.yaml
-# Give unique adjective to a set of options
+# Rename options with a unique name 
 $ ./brunch/yama -o ./conf conf/opts.yaml
 
 # Create uniquely named z3 binary
 $ ./brunch/mkz3 PATH/z3 -o ./bin
 
-# Create uniquely named binary + options run script
-#  Name of z3 binary depends on result of mkz3
+# Create uniquely named binary+options script
+# Note that the name of z3 binary depends on result of mkz3
 $ ./brunch/mktool bin/z3-hit-c34b1d0 conf/z3-spurned.yaml
 
 # Create a list of benchmarks
 $ find /ag/bat-exp/data/ldv-bat/ -name '*.smt2' | head > idx/ldv-bat.idx
 
-# Create script to run parallel
+# Create script to run GNU  Parallel
 $ ./brunch/mkpar ./run/hit-spurned.sh idx/ldv-bat.idx
 
-# Run benchmarks. Repeat as needed. Output is in out directory
+# Run benchmarks. Repeat as needed.
+# Note that output is placed in directory ./out
 $ time run/run-hit-spurned.sh
 
-# Generate stats csv for further analysis
+# Generate stats.csv for further analysis.
 # Repeat for every output directory
 $ ./brunch/scrab  -o out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40/stats.csv \
   out/hit.spurned.ldv-bat.mymble.dba.18_01_2022-t20-56-40
