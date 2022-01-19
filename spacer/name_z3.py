@@ -43,7 +43,7 @@ class Z3Namer(object):
         git_sha = z3ver[9]
         short_git_sha = git_sha[0:7]
         noun = words.get_a_noun(length=5, bound='atmost', seed=git_sha)
-        z3bin_base = os.path.basename(z3bin)
+        z3bin_base = os.path.basename(z3bin).replace('-', '_')
 
         z3_name = f'{z3bin_base}-{noun}-{short_git_sha}'
         if copy_mode:
