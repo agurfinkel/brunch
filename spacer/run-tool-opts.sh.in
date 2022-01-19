@@ -8,13 +8,12 @@ EXP_NAME=$$(python -m spacer.exp_name ${idx})
 
 OUT=${out_dir}/$${TOOL_NAME}.$${OPTS_NAME}.$${EXP_NAME}
 
-echo "Creating directory: $$OUT"
+echo "Experiment: $${EXP_NAME}"
+echo "Creating output directory: $$OUT"
 mkdir -p $$OUT
 
 PARALLEL=${parallel}
 JOBS=${jobs}
 
-echo "Experiment: $${EXP_NAME}"
-echo "Output directory: $${OUT}"
 echo "Starting GNU parallel with $$JOBS jobs ..."
 time $$PARALLEL -j $$JOBS --ungroup --results $$OUT/{/} $$TOOL :::: ${idx}
