@@ -19,7 +19,7 @@ class MkTool(object):
         self._help = 'Create script to run a tool'
 
     def mk_arg_parser(self, ap):
-        ap.add_argument('z3bin', metavar='FILE', help='Path to Z3 binary')
+        ap.add_argument('z3bin', metavar='Z3', help='Path to Z3 binary')
         ap.add_argument('yaml', metavar='CONF', help='Configuration file')
         ap.add_argument('--out',
                         '-o',
