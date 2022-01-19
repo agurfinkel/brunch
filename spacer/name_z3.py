@@ -40,8 +40,17 @@ class Z3Namer(object):
                                             shell=True,
                                             encoding='utf-8')
         z3ver = z3ver_str.split()
-        git_sha = z3ver[9]
-        short_git_sha = git_sha[0:7]
+
+        if len(z3ver) == 10:
+            # z3 version with build hashcode
+            git_sha = z3ver[9]
+            short_git_sha = git_sha[0:7]
+        else:
+            # z3 release without build hashcode
+            # use z3_version instead of the hashcode
+            git_sha = z3ver[2].replace('.', '_')
+            short_git_sha = git_sha
+
         noun = words.get_a_noun(length=5, bound='atmost', seed=git_sha)
         z3bin_base = os.path.basename(z3bin).replace('-', '_')
 
