@@ -53,7 +53,7 @@ class MkTool(object):
         tool_name = os.path.basename(z3bin)
         tool_name = os.path.splitext(tool_name)[0]
         tool_name = tool_name.split('-')
-        if len(tool_name) == 3 and tool_name[0] == 'z3':
+        if len(tool_name) == 3 and tool_name[0].startswith('z3'):
             tool_name = tool_name[1]
         else:
             tool_name = '_'.join(tool_name)
