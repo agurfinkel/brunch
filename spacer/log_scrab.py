@@ -143,7 +143,7 @@ class RealTime(object):
         self.field = 'real_time'
 
     def match(self, line):
-        """From runsolver"""
+        """From runsolver."""
         try:
             if not line.startswith('Real time (s): '):
                 return None
@@ -159,7 +159,7 @@ class MaxMemory(object):
         self.field = 'max_memory'
 
     def match(self, line):
-        """From runsolver"""
+        """From runsolver."""
         try:
             if not line.startswith(
                     'Max. memory (cumulated for all children) (KiB): '):
@@ -176,7 +176,7 @@ class BrunchStat(object):
         pass
 
     def match(self, line):
-        """BRUNCH_STAT field value"""
+        """BRUNCH_STAT field value."""
         try:
             if not line.startswith('BRUNCH_STAT'):
                 return None
@@ -227,7 +227,7 @@ class LogScrabber(object):
                         dest='out_file',
                         metavar='FILE',
                         help='Output file name',
-                        default='out.csv')
+                        default=None)
         ap.add_argument('in_files',
                         metavar='FILE',
                         help='Input file',
@@ -250,7 +250,7 @@ class LogScrabber(object):
                 print('[WARNING]: exception for:', line)
                 print("Unexpected error:", sys.exc_info())
 
-    def _processFile(self, fname):
+    def _process_file(self, fname):
         '''process a single file'''
 
         base_name = os.path.basename(fname)
@@ -264,27 +264,27 @@ class LogScrabber(object):
             for line in input:
                 self._scrab(name, line.strip())
 
-    def _processDir(self, root):
+    def _process_dir(self, root):
         '''Recursively process all files in the root directory'''
         for root, dirs, files in os.walk(root):
             for name in files:
-                self._processFile(os.path.join(root, name))
+                self._process_file(os.path.join(root, name))
 
     def _process(self, name):
         if os.path.isfile(name):
-            self._processFile(name)
+            self._process_file(name)
         elif os.path.isdir(name):
-            self._processDir(name)
+            self._process_dir(name)
         else:
             assert False
 
-    def _writeTable(self, out):
+    def _write_table(self, out):
         df = pandas.DataFrame(self.store)
 
         def _last_fn(a):
             return a.at[a.last_valid_index()]
 
-        ## use pivot_table with aggfunc that picks the first value
+        # use pivot_table with aggfunc that picks the first value
         df = df.pivot_table(index='index',
                             columns='field',
                             values='value',
@@ -292,10 +292,22 @@ class LogScrabber(object):
         df.to_csv(out)
 
     def run(self, args=None):
+
+        # default output destination is file `stats.csv`
+        # in input directory (if input dir is given)
+        if args.out_file is None:
+            args.out_file = 'stats.csv'
+            if len(args.in_files) == 1:
+                in_file = args.in_files[0]
+                if os.path.isdir(in_file):
+                    args.out_file = os.path.join(in_file, args.out_file)
+
+        print('Creating', args.out_file, '...')
+
         for f in args.in_files:
             self._process(f)
 
-        self._writeTable(args.out_file)
+        self._write_table(args.out_file)
 
         return 0
 
@@ -315,4 +327,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     sys.exit(main())
