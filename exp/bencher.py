@@ -26,7 +26,6 @@ class Bencher(object):
                         metavar='EXT',
                         type=str,
                         default='smt2',
-                        required=True,
                         help='File extension')
         ap.add_argument('--prefix',
                         '-p',
