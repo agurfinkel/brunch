@@ -14,5 +14,5 @@ z3:
 Rename to unique easy-to-remember name using 
 
 ```bash
-$ python -m spacer.yama -v conf.yaml -o .
+$ ./brunch/yama -v conf.yaml -o .
 ```
