@@ -5,28 +5,26 @@ z3:
   memory: 16384
 fp:
   xform:
+    # slicing and inlining is enabled
+    # useful for CHC-COMP, but complicates debugging
     slice: true
     inline_linear: true
     inline_eager: true
     tail_simplifier_pve: false
-  print_statistics: false
   engine: spacer
   validate: true
+  print_statistics: true 
   spacer:
     elim_aux: true
     reach_dnf: true
+
     iuc: 1
     iuc.arith: 1
-    mbqi: false
+    iuc.old_hyp_reducer: false
+    iuc.print_farkas_stats: false
+
     ground_pobs: true
     mbqi: false
-    iuc.print_farkas_stats: false
-    iuc.old_hyp_reducer: false
+
     ctp: true
     native_mbp: true
-    #global guidance related stuff
-    expand_bnd: true
-    global: true
-    concretize: true
-    subsume: true
-    conjecture: true

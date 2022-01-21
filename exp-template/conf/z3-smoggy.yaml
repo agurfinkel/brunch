@@ -1,0 +1,38 @@
+z3:
+  v: 1
+  st: ''
+  T: 60
+  memory: 16384
+fp:
+  xform:
+    # slicing and inlining is enabled
+    # useful for CHC-COMP, but complicates debugging
+    slice: true
+    inline_linear: true
+    inline_eager: true
+    tail_simplifier_pve: false
+  engine: spacer
+  validate: true
+  print_statistics: true 
+  spacer:
+    elim_aux: true
+    reach_dnf: true
+
+    # interpolation
+    iuc: 1
+    iuc.arith: 1
+    iuc.old_hyp_reducer: false
+    iuc.print_farkas_stats: false
+    
+    ground_pobs: true
+    mbqi: false
+
+    ctp: true
+    native_mbp: true
+
+    #global guidance related stuff
+    global: true
+    expand_bnd: true
+    concretize: true
+    subsume: true
+    conjecture: true

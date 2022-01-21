@@ -9,25 +9,30 @@ fp:
     inline_linear: true
     inline_eager: true
     tail_simplifier_pve: false
-  print_statistics: false
   engine: spacer
   validate: true
+  print_statistics: true
   spacer:
     elim_aux: true
     reach_dnf: true
+
+    # turn interpolation off
     iuc: 0
-    mbqi: false
-    ground_pobs: true
-    mbqi: false
     iuc.print_farkas_stats: false
     iuc.old_hyp_reducer: false
+
+    ground_pobs: true
+    mbqi: false
+
     ctp: true
     native_mbp: true
+
     #global guidance related stuff
-    expand_bnd: true
     global: true
+    expand_bnd: true
     concretize: true
     subsume: true
     conjecture: true
+
     #turn off interpolation
     use_iuc: false
