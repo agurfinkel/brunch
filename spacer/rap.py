@@ -17,7 +17,12 @@ class RapSheet:
             self.dir = _path.parent
             self.stats_file = _path
         else:
-            assert False
+            # look for possible choice by name match
+            files = list(Path('.').glob(f'**/*{path}*/stats.csv'))
+            assert (len(files) == 1)
+
+            self.stats_file = files[0]
+            self.dir = self.stats_file.parent
 
         # if name looks like expected, extract descriptive name
         # ow, use directory as the name
