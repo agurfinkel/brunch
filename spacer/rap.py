@@ -62,8 +62,8 @@ class RapSheet:
                         ]].merge(other.df[[join_on, 'status']],
                                  on=join_on,
                                  suffixes=('_' + self.name, '_' + other.name))
-        return _mrg.groupby([f'status_{self.name}',
-                             f'status_{other.name}']).count()[[join_on]]
+        return _mrg.groupby([f'status_{self.name}', f'status_{other.name}'
+                             ]).count()[[join_on]].reset_index()
 
     def compare_time(self, other, join_on='index'):
         _mrg = self.df[[join_on, 'status', 'time'
