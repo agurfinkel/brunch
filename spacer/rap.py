@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 import sys
 import argparse
+from blessings import Terminal
 
 
 class RapSheet:
@@ -79,6 +80,7 @@ class RapCmd(object):
     def __init__(self):
         self._name = 'rap'
         self._help = 'Describe statistics of a run'
+        self._term = Terminal()
 
     def mk_arg_parser(self, ap):
         ap.add_argument('exps',
@@ -88,18 +90,27 @@ class RapCmd(object):
 
     def run(self, args=None):
 
-        assert len(args.exps) <= 2
-
         rs = list()
+        time_stats = list()
+        status_stats = list()
         for exp in args.exps:
             rs.append(RapSheet(exp))
             name = rs[-1].name
             df = rs[-1].df
-            print(f'Stats for {name}:')
-            print(df.time.describe())
-            print(df.status.value_counts(), end='\n\n')
+            time_stats.append(df.time.describe())
+            time_stats[-1].name = f'{name}'
+            status_stats.append(df.status.value_counts())
+            status_stats[-1].name = f'{name}'
 
-        if len(rs) == 2:
+        print(f'{self._term.yellow}Time statistics:{self._term.normal}')
+        print(pd.concat(time_stats, axis=1))
+
+        print(f'{self._term.yellow}Status statistics:{self._term.normal}')
+        print(pd.concat(status_stats, axis=1))
+
+        if len(rs) >= 2:
+            first = 'first ' if len(rs) > 2 else ''
+            print(f'{self._term.yellow}Comparing {first}two runs:{self._term.normal}')
             print(rs[0].compare_status(rs[1]))
 
         return 0
