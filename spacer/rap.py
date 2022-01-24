@@ -38,17 +38,24 @@ class RapSheet:
     def _load_stats(self):
         _df = pd.read_csv(self.stats_file)
 
-        # push unknown time to max
-        max_time = int(_df.time.max() + 50)
-        _df.time.fillna(value=max_time, inplace=True)
+        # push unknown time to 20% over max in its column
+        for col in _df.columns:
+            if col.startswith('time'):
+                col_max = _df[col].max()
+                col_max = int(1.2 * col_max)
+                _df[col].fillna(value=col_max, inplace=True)
 
-        # other data cleaning goes here
+        # empty status means some unexpected error
+        _df.status.fillna('unexpected', inplace=True)
+
+        # Add other data cleaning here
 
         return _df
 
     def get_by_status(self):
         """Get DataFrame grouped by status."""
-        return self.df[['index', 'status']].groupby('status').count()
+        return self.df[['index',
+                        'status']].groupby('status').count().reset_index()
 
     def compare_status(self, other, join_on='index'):
         _mrg = self.df[[join_on, 'status'
@@ -67,10 +74,6 @@ class RapSheet:
                              ])[[f'time_{self.name}', f'time_{other.name}']]
 
 
-
-
-
-
 class RapCmd(object):
 
     def __init__(self):
@@ -78,7 +81,8 @@ class RapCmd(object):
         self._help = 'Describe statistics of a run'
 
     def mk_arg_parser(self, ap):
-        ap.add_argument('exps', nargs='+',
+        ap.add_argument('exps',
+                        nargs='+',
                         help='Output directories for experiments')
         return ap
 
@@ -90,10 +94,10 @@ class RapCmd(object):
         for exp in args.exps:
             rs.append(RapSheet(exp))
             name = rs[-1].name
+            df = rs[-1].df
             print(f'Stats for {name}:')
-            print(rs[-1].df.time.describe())
-            print(rs[-1].get_by_status())
-            print()
+            print(df.time.describe())
+            print(df.status.value_counts(), end='\n\n')
 
         if len(rs) == 2:
             print(rs[0].compare_status(rs[1]))
