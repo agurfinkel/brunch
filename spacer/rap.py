@@ -9,7 +9,13 @@ from blessings import Terminal
 
 class RapSheet:
 
-    def __init__(self, path):
+    def __init__(self, path, with_tool=False, with_opts=False):
+        """Create a rap sheet
+
+        :param path-like path Location of stats.csv or directory containing it
+        :param bool with_tool Include tool name into the name of the sheet
+        :param bool with_opts Include opt name into the name of the sheet
+        """
         _path = Path(path).absolute()
         if _path.is_dir():
             self.dir = _path
@@ -30,6 +36,12 @@ class RapSheet:
         _name = self.dir.name.split('.')
         if len(_name) >= 4:
             self.name = _name[-2]
+            self.tool_name = _name[0]
+            self.opt_name = _name[1]
+            if with_opts:
+                self.name = f'{self.opt_name}.{self.name}'
+            if with_tool:
+                self.name = f'{self.tool_name}.{self.name}'
         else:
             self.name = self.dir.name
 
@@ -83,6 +95,10 @@ class RapCmd(object):
         self._term = Terminal()
 
     def mk_arg_parser(self, ap):
+        ap.add_argument('--with-tool', action='store_true',
+                        help='Include tool name into the name of results')
+        ap.add_argument('--with-opts', action='store_true',
+                        help='Include options name into the name of results')
         ap.add_argument('exps',
                         nargs='+',
                         help='Output directories for experiments')
@@ -94,7 +110,9 @@ class RapCmd(object):
         time_stats = list()
         status_stats = list()
         for exp in args.exps:
-            rs.append(RapSheet(exp))
+            rs.append(RapSheet(exp,
+                               with_tool=args.with_tool,
+                               with_opts=args.with_opts))
             name = rs[-1].name
             df = rs[-1].df
             time_stats.append(df.time.describe())
