@@ -61,6 +61,13 @@ class RapSheet:
         # empty status means some unexpected error
         _df.status.fillna('unexpected', inplace=True)
 
+        # if there is an error column, adjust status
+        if 'error' in _df:
+            def _cln_sts(c):
+                return c.status if c.error == 0 else 'error'
+            _df.error.fillna(0, inplace=True)
+            _df.status = _df.apply(_cln_sts, axis=1)
+
         # Add other data cleaning here
 
         return _df
