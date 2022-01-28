@@ -112,7 +112,7 @@ class RapCmd(object):
         return ap
 
     def run(self, args=None):
-
+        pd.set_option('precision', 2)
         rs = list()
         time_stats = list()
         status_stats = list()
@@ -131,7 +131,7 @@ class RapCmd(object):
         print(pd.concat(time_stats, axis=1))
 
         print(f'{self._term.yellow}Status statistics:{self._term.normal}')
-        print(pd.concat(status_stats, axis=1))
+        print(pd.concat(status_stats, axis=1).fillna(0))
 
         if len(rs) >= 2:
             first = 'first ' if len(rs) > 2 else ''
