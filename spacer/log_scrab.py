@@ -58,6 +58,17 @@ class ExactMatch(object):
         return None
 
 
+class ErrorMatch(object):
+
+    def __init__(self, name='error'):
+        self.field = name
+
+    def match(self, line):
+        if line.startswith('(error'):
+            return (self.field, '1')
+        return None
+
+
 class MemoryExcMatch(object):
 
     def __init__(self, name):
@@ -78,7 +89,8 @@ class ErrorExcMatch(object):
         if line.endswith('unexpected end of quoted symbol")'):
             return (self.field, 'error_quote')
         elif line.endswith(
-                'Invalid query argument, expected uinterpreted function name, but argument is interpreted")'
+                'Invalid query argument, expected uinterpreted ' + \
+                'function name, but argument is interpreted")'
         ):
             return (self.field, 'error_interp')
         return None
@@ -207,6 +219,7 @@ class LogScrabber(object):
         self.matchers.append(MemoryExcMatch('status'))
         self.matchers.append(ErrorExcMatch('status'))
         self.matchers.append(ExitStatus())
+        self.matchers.append(ErrorMatch())
         self.matchers.append(CpuTime())
         self.matchers.append(RealTime())
         self.matchers.append(PosixTime())
