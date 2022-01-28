@@ -297,6 +297,10 @@ class LogScrabber(object):
         def _last_fn(a):
             return a.at[a.last_valid_index()]
 
+        if len(df) == 0:
+            print('Error: no data')
+            return None
+
         # use pivot_table with aggfunc that picks the first value
         df = df.pivot_table(index='index',
                             columns='field',
