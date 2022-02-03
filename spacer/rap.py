@@ -39,9 +39,9 @@ class RapSheet:
             self.tool_name = _name[0]
             self.opt_name = _name[1]
             if with_opts:
-                self.name = f'{self.opt_name}.{self.name}'
+                self.name = f'{self.opt_name}_{self.name}'
             if with_tool:
-                self.name = f'{self.tool_name}.{self.name}'
+                self.name = f'{self.tool_name}_{self.name}'
         else:
             self.name = self.dir.name
 
@@ -93,6 +93,31 @@ class RapSheet:
         return _mrg.groupby([f'status_{self.name}', f'status_{other.name}'
                              ])[[f'time_{self.name}', f'time_{other.name}']]
 
+    def analyze_time(self, other, join_on='index'):
+        _mrg = self.df[[join_on, 'status', 'time'
+                        ]].merge(other.df[[join_on, 'status', 'time']],
+                                 on=join_on,
+                                 suffixes=('_' + self.name, '_' + other.name))
+
+        _t_col_self = f'time_{self.name}'
+        _t_col_other = f'time_{other.name}'
+        _stat_col_self = f'status_{self.name}'
+        _stat_col_other = f'status_{other.name}'
+
+        #SAT instances in which other is way faster than self
+        dfs1 = _mrg.query(f'({_stat_col_self} == "sat" & {_stat_col_other} == "sat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self  }> 0)')[["index", _t_col_self, _t_col_other]]
+        #SAT instances in which self is way faster than other
+        dfs2 = _mrg.query(f'({ _stat_col_self } == "sat" & { _stat_col_other } == "sat" & { _t_col_other } >= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]]
+
+        #UNSAT instances in which other is way faster than self
+        dfu1 = _mrg.query(f'({ _stat_col_self } == "unsat" & { _stat_col_other } == "unsat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self } > 0)')[["index", _t_col_self, _t_col_other]]
+        #UNSAT instances in which self is way faster than other
+        dfu2 = _mrg.query(f'({ _stat_col_self  }== "unsat" & { _stat_col_other  }== "unsat" & { _t_col_other  }>= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]]
+
+        return dfs1, dfs2, dfu1, dfu2
+
+    def merge(self, other, join_on='index', how='inner'):
+        return self.df.merge(other.df, on=join_on, suffixes=('_' + self.name, '_' + other.name), how=how)
 
 class RapCmd(object):
 
