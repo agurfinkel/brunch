@@ -39,14 +39,18 @@ class RapSheet:
             self.tool_name = _name[0]
             self.opt_name = _name[1]
             if with_opts:
-                self.name = f'{self.opt_name}_{self.name}'
+                self.name = f'{self.opt_name}.{self.name}'
             if with_tool:
-                self.name = f'{self.tool_name}_{self.name}'
+                self.name = f'{self.tool_name}.{self.name}'
         else:
             self.name = self.dir.name
 
         # load csv file into data frame
         self.df = self._load_stats()
+
+    # construct suffix to identify this rap sheet when merged with other rap sheets
+    def get_df_suffix(self):
+        return f'_{self.name.replace(".", "_")}'
 
     def _load_stats(self):
         _df = pd.read_csv(self.stats_file)
