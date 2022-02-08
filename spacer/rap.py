@@ -85,43 +85,63 @@ class RapSheet:
         _mrg = self.df[[join_on, 'status'
                         ]].merge(other.df[[join_on, 'status']],
                                  on=join_on,
-                                 suffixes=('_' + self.name, '_' + other.name))
-        return _mrg.groupby([f'status_{self.name}', f'status_{other.name}'
+                                 suffixes = (self.get_df_suffix(), other.get_df_suffix()))
+        return _mrg.groupby(["status" + self.get_df_suffix(), "status" + other.get_df_suffix()
                              ]).count()[[join_on]].reset_index()
 
     def compare_time(self, other, join_on='index'):
         _mrg = self.df[[join_on, 'status', 'time'
                         ]].merge(other.df[[join_on, 'status', 'time']],
                                  on=join_on,
-                                 suffixes=('_' + self.name, '_' + other.name))
-        return _mrg.groupby([f'status_{self.name}', f'status_{other.name}'
-                             ])[[f'time_{self.name}', f'time_{other.name}']]
+                                 suffixes = (self.get_df_suffix(), other.get_df_suffix()))
+        return _mrg.groupby(["status" + self.get_df_suffix(), "status" + other.get_df_suffix()
+                             ])[["time" + self.get_df_suffix(), "time" + other.get_df_suffix()]]
 
-    def analyze_time(self, other, join_on='index'):
-        _mrg = self.df[[join_on, 'status', 'time'
-                        ]].merge(other.df[[join_on, 'status', 'time']],
-                                 on=join_on,
-                                 suffixes=('_' + self.name, '_' + other.name))
+    def analyze_time(self, other):
+        _mrg = self.df[['index', 'status', 'time'
+                        ]].merge(other.df[['index', 'status', 'time']],
+                                 on='index',
+                                 suffixes = (self.get_df_suffix(), other.get_df_suffix()))
 
-        _t_col_self = f'time_{self.name}'
-        _t_col_other = f'time_{other.name}'
-        _stat_col_self = f'status_{self.name}'
-        _stat_col_other = f'status_{other.name}'
+        _t_col_self = "time" + self.get_df_suffix()
+        _t_col_other = "time" + other.get_df_suffix()
+        _stat_col_self = "status" + self.get_df_suffix()
+        _stat_col_other = "status" + other.get_df_suffix()
 
         #SAT instances in which other is way faster than self
-        dfs1 = _mrg.query(f'({_stat_col_self} == "sat" & {_stat_col_other} == "sat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self  }> 0)')[["index", _t_col_self, _t_col_other]]
+        dfs1 = _mrg.query(f'({_stat_col_self} == "sat" & {_stat_col_other} == "sat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self  }> 0)')[["index", _t_col_self, _t_col_other]].sort_values(by=[_t_col_other])
         #SAT instances in which self is way faster than other
-        dfs2 = _mrg.query(f'({ _stat_col_self } == "sat" & { _stat_col_other } == "sat" & { _t_col_other } >= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]]
+        dfs2 = _mrg.query(f'({ _stat_col_self } == "sat" & { _stat_col_other } == "sat" & { _t_col_other } >= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]].sort_values(by=[_t_col_self])
 
         #UNSAT instances in which other is way faster than self
-        dfu1 = _mrg.query(f'({ _stat_col_self } == "unsat" & { _stat_col_other } == "unsat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self } > 0)')[["index", _t_col_self, _t_col_other]]
+        dfu1 = _mrg.query(f'({ _stat_col_self } == "unsat" & { _stat_col_other } == "unsat" & { _t_col_self } >= 2 * { _t_col_other } & { _t_col_self } > 0)')[["index", _t_col_self, _t_col_other]].sort_values(by=[_t_col_other])
         #UNSAT instances in which self is way faster than other
-        dfu2 = _mrg.query(f'({ _stat_col_self  }== "unsat" & { _stat_col_other  }== "unsat" & { _t_col_other  }>= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]]
+        dfu2 = _mrg.query(f'({ _stat_col_self  }== "unsat" & { _stat_col_other  }== "unsat" & { _t_col_other  }>= 2 * { _t_col_self } & { _t_col_other } > 0)')[["index", _t_col_self, _t_col_other]].sort_values(by=[_t_col_self])
 
         return dfs1, dfs2, dfu1, dfu2
 
-    def merge(self, other, join_on='index', how='inner'):
-        return self.df.merge(other.df, on=join_on, suffixes=('_' + self.name, '_' + other.name), how=how)
+    def solved_only_by_self(self, other):
+        _mrg = self.df[['index', 'status', 'time'
+                        ]].merge(other.df[['index', 'status', 'time']],
+                                 on='index',
+                                 suffixes = (self.get_df_suffix(), other.get_df_suffix()))
+        _stat_col_self = "status" + self.get_df_suffix()
+        _stat_col_other = "status" + other.get_df_suffix()
+        _t_col_self = "time" + self.get_df_suffix()
+        _t_col_other = "time" + other.get_df_suffix()
+        dfsat = _mrg.query(f'({_stat_col_self} == "sat" & {_stat_col_other} != "sat")')[["index", _stat_col_other, _t_col_self]]
+        dfunsat = _mrg.query(f'({_stat_col_self} == "unsat" & {_stat_col_other} != "unsat")')[["index", _stat_col_other, _t_col_self]]
+        return dfsat, dfunsat
+
+    def merge(self, other, join_on = 'index', how = 'inner'):
+        return self.df.merge(other.df, on = join_on, suffixes = (self.get_df_suffix(), other.get_df_suffix()), how = how)
+
+    # fetch all rows whose status is either sat or unsat
+    def get_solved(self):
+        import copy
+        n = copy.deepcopy(self)
+        n.df = n.df.query('status == "sat" | status == "unsat"')
+        return n
 
 class RapCmd(object):
 
