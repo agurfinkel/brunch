@@ -227,7 +227,7 @@ class LogScrabber(object):
         self.matchers.append(BrunchStat())
         regex = r'[(]?:(?P<fld>[a-zA-Z0-9_.-]+)\s+(?P<val>\d+(:?[.]\d+)?)'
         flt = PrefixFilter(
-            ['SPACER-', 'time', 'virtual_solver', 'memory', 'max-memory'])
+            ['SPACER-', 'time', 'virtual_solver', 'memory', 'max-memory', 'total-time'])
         reMatch = ReMatch(regex=regex, filt=flt)
         self.matchers.append(reMatch)
 
